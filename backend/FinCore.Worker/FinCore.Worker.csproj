@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <!--
+    FinCore.Worker · procesos en segundo plano (Etapa 4).
+    En Windows se instala como servicio (UseWindowsService); en Docker/Linux corre como proceso de consola.
+  -->
+  <PropertyGroup>
+    <UserSecretsId>fincore-worker</UserSecretsId>
+    <AssemblyName>FinCore.Worker</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
+    <PackageReference Include="Serilog.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FinCore.Application\FinCore.Application.csproj" />
+    <ProjectReference Include="..\FinCore.Infrastructure\FinCore.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FinCore.Tests" />
+  </ItemGroup>
+</Project>

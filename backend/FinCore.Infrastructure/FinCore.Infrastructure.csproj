@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FinCore.Application\FinCore.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Una sola consulta de extracción para el Worker y el paquete SSIS: el archivo vive en etl/ y se incrusta aquí. -->
+    <EmbeddedResource Include="../../etl/FinCore.Integration.SSIS/sql/oracle_extract_movements.sql" LogicalName="oracle_extract_movements.sql" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,83 @@
+<main class="login">
+  <div class="frame">
+    <section class="art" aria-hidden="false">
+      <header class="brand">
+        <span class="brand__logo"><mat-icon>spa</mat-icon></span>
+        <span class="brand__name">FinCore</span>
+      </header>
+      <fc-login-illustration class="illustration" />
+      <p class="art__quote">“Las cuentas claras y el chocolate espeso.”</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel__inner">
+        <h1>{{ lastUser ? greeting + ', qué bueno verte de nuevo' : 'Bienvenido a FinCore' }}</h1>
+        <p class="subtitle">Tus operaciones y conciliaciones, en orden y en familia.</p>
+
+        <mat-tab-group class="tabs" [selectedIndex]="tab()" (selectedIndexChange)="tab.set($event)" mat-stretch-tabs="false"
+                       mat-align-tabs="center" animationDuration="200ms">
+          <mat-tab label="Usuario">
+            <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
+              @if (expired) {
+                <div class="fc-alert fc-alert--info" role="status"><mat-icon>schedule</mat-icon> Tu sesión expiró. Ingresa de nuevo.</div>
+              }
+
+              <mat-form-field appearance="outline">
+                <mat-label>Usuario</mat-label>
+                <mat-icon matPrefix>person</mat-icon>
+                <input matInput formControlName="userName" autocomplete="username" [attr.autofocus]="lastUser ? null : ''" />
+                @if (form.controls.userName.hasError('required')) { <mat-error>Escribe tu usuario.</mat-error> }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Contraseña</mat-label>
+                <mat-icon matPrefix>lock</mat-icon>
+                <input matInput [type]="showPassword() ? 'text' : 'password'" formControlName="password"
+                       autocomplete="current-password" [attr.autofocus]="lastUser ? '' : null" />
+                <button matIconButton matSuffix type="button" (click)="showPassword.set(!showPassword())"
+                        [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                  <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if (form.controls.password.hasError('required')) { <mat-error>Escribe tu contraseña.</mat-error> }
+              </mat-form-field>
+
+              <div class="row">
+                <mat-checkbox formControlName="rememberMe">Mantener sesión iniciada</mat-checkbox>
+                <button type="button" class="link" (click)="forgotPassword()">¿Olvidaste tu contraseña?</button>
+              </div>
+
+              @if (error(); as err) {
+                <div class="fc-alert fc-alert--danger" role="alert">
+                  <mat-icon>error</mat-icon>
+                  <div>{{ err.message }} @if (err.correlationId) { <small>Referencia de soporte: {{ err.correlationId }}</small> }</div>
+                </div>
+              }
+
+              <button matButton="filled" class="fc-sofa-btn submit" type="submit" [disabled]="submitting()">
+                {{ submitting() ? 'Ingresando…' : 'Ingresar' }}
+              </button>
+              @if (submitting()) { <mat-progress-bar mode="indeterminate" class="bar" /> }
+
+              <p class="first-time">¿Primera vez aquí? <strong>Pide tu usuario</strong> al administrador de tu sucursal.</p>
+            </form>
+          </mat-tab>
+
+          <mat-tab label="Demostración">
+            <div class="demo">
+              <p class="fc-muted">Elige un perfil para conocer FinCore. Contraseña: <span class="fc-mono">FinCore*2026</span></p>
+              <mat-action-list>
+                @for (u of demoUsers; track u.userName) {
+                  <button mat-list-item (click)="useDemo(u.userName)">
+                    <span matListItemAvatar [class]="'demo__icon demo__icon--' + u.tone"><mat-icon>{{ u.icon }}</mat-icon></span>
+                    <span matListItemTitle>{{ u.name }}</span>
+                    <span matListItemLine>{{ u.hint }}</span>
+                  </button>
+                }
+              </mat-action-list>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </section>
+  </div>
+</main>

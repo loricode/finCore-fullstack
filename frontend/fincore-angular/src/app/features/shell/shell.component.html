@@ -1,0 +1,62 @@
+<div class="shell" [class.shell--menu-open]="menuOpen()">
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <span class="logo"><mat-icon>spa</mat-icon></span>
+      <span class="brand-name">FinCore</span>
+    </div>
+
+    <nav aria-label="Principal">
+      @for (item of nav(); track item.path; let i = $index) {
+        <a [routerLink]="item.path" routerLinkActive="active" class="fc-enter" [style.--i]="i" (click)="menuOpen.set(false)">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar__footer">
+      <mat-icon>local_florist</mat-icon>
+      <span>Todo en orden, a tu ritmo.</span>
+    </div>
+  </aside>
+
+  <div class="scrim" (click)="menuOpen.set(false)"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button matIconButton class="menu-toggle" type="button" (click)="menuOpen.set(!menuOpen())" aria-label="Abrir menú">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <div class="greeting">
+        <span class="fc-muted">{{ greeting }},</span>
+        <strong>{{ firstName() }}</strong>
+      </div>
+      <div class="spacer"></div>
+
+      @if (auth.currentUser(); as user) {
+        <button class="user" type="button" [matMenuTriggerFor]="userMenu" aria-label="Menú de usuario">
+          <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+          <span class="user__text">
+            <strong>{{ user.fullName }}</strong>
+            <small>{{ user.roles.join(' · ') }}</small>
+          </span>
+          <mat-icon class="chevron">expand_more</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu" xPosition="before">
+          <div class="menu-header">
+            <strong>{{ user.userName }}</strong>
+            <small class="fc-muted">{{ user.email }}</small>
+          </div>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Cerrar sesión</span>
+          </button>
+        </mat-menu>
+      }
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

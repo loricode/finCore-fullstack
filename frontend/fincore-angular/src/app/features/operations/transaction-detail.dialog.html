@@ -1,0 +1,77 @@
+@if (detail(); as d) {
+  @let t = d.transaction;
+  <div class="hero" [class]="'hero hero--' + t.statusCode">
+    <div class="hero__top">
+      <span class="type-icon"><mat-icon>{{ typeIcons[t.typeCode] }}</mat-icon></span>
+      <div class="hero__title">
+        <span class="fc-muted">{{ t.typeName }} · {{ t.branchName }}</span>
+        <h2 class="fc-mono">{{ t.reference }}</h2>
+      </div>
+      <span [class]="'fc-status fc-status--' + t.statusCode">{{ t.statusName }}</span>
+    </div>
+    <div class="hero__amount fc-money" [class.fc-money--in]="t.signedAmount > 0" [class.fc-money--out]="t.signedAmount < 0">
+      {{ t.signedAmount > 0 ? '+' : '−' }}{{ t.amount | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}
+    </div>
+  </div>
+
+  @if (busy()) { <mat-progress-bar mode="indeterminate" /> }
+
+  <mat-dialog-content class="body">
+    <dl class="facts">
+      <div><dt>Fecha de operación</dt><dd>{{ t.operationDate + 'T00:00:00' | date: 'EEEE d \'de\' MMMM, y' }}</dd></div>
+      <div><dt>Cuenta</dt><dd>{{ t.accountCode }}</dd></div>
+      @if (t.counterpartyName) { <div><dt>Contraparte</dt><dd>{{ t.counterpartyName }} @if (t.counterpartyAccount) { <span class="fc-muted">· {{ t.counterpartyAccount }}</span> }</dd></div> }
+      <div><dt>Registró</dt><dd>{{ t.createdByUserName }} <span class="fc-muted">· {{ t.createdAtUtc + 'Z' | date: 'd MMM, h:mm a' }}</span></dd></div>
+      @if (t.description) { <div class="wide"><dt>Descripción</dt><dd>{{ t.description }}</dd></div> }
+      @if (t.rejectionReason) { <div class="wide"><dt>Motivo del rechazo</dt><dd class="reason">{{ t.rejectionReason }}</dd></div> }
+    </dl>
+
+    @if (t.originalPublicId) {
+      <button class="link-card" type="button" (click)="open(t.originalPublicId)">
+        <mat-icon>link</mat-icon> Esta operación revierte otra. <strong>Ver la original</strong>
+      </button>
+    }
+    @if (t.reversalPublicId) {
+      <button class="link-card" type="button" (click)="open(t.reversalPublicId)">
+        <mat-icon>undo</mat-icon> Fue revertida. <strong>Ver la reversión</strong>
+      </button>
+    }
+
+    <h3>Historial</h3>
+    <ol class="timeline">
+      @for (h of d.history; track $index; let i = $index) {
+        <li class="fc-enter" [style.--i]="i">
+          <span class="dot"></span>
+          <div>
+            <strong>{{ h.fromStatus ? h.fromStatus + ' → ' + h.toStatus : 'Registrada como ' + h.toStatus }}</strong>
+            <span class="fc-muted"> · {{ h.changedBy ?? 'sistema' }} · {{ h.changedAtUtc + 'Z' | date: 'd MMM, h:mm a' }}</span>
+            @if (h.reason) { <div class="reason">“{{ h.reason }}”</div> }
+            @if (h.correlationId) { <div class="corr fc-mono" matTooltip="Id de correlación: une este cambio con los logs y la auditoría">{{ h.correlationId }}</div> }
+          </div>
+        </li>
+      }
+    </ol>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="actions">
+    <button matButton type="button" (click)="close()">Cerrar</button>
+    <span class="spacer"></span>
+    @if (d.actions.canEdit) {
+      <button matButton="tonal" class="fc-pastel fc-pastel--teal" type="button" [disabled]="busy()" (click)="edit()"><mat-icon>edit</mat-icon> Editar</button>
+    }
+    @if (d.actions.canReject) {
+      <button matButton="tonal" class="fc-pastel fc-pastel--blush" type="button" [disabled]="busy()" (click)="reject()"><mat-icon>block</mat-icon> Rechazar</button>
+    }
+    @if (d.actions.canReverse) {
+      <button matButton="tonal" class="fc-pastel fc-pastel--lavender" type="button" [disabled]="busy()" (click)="reverse()"><mat-icon>undo</mat-icon> Revertir</button>
+    }
+    @if (d.actions.canProcess) {
+      <button matButton="tonal" class="fc-pastel fc-pastel--sage" type="button" [disabled]="busy()" (click)="process()"><mat-icon>task_alt</mat-icon> Procesar</button>
+    }
+    @if (t.statusCode === 'PENDING' && !d.actions.canProcess && t.amount >= 10000000) {
+      <span class="note fc-muted"><mat-icon>diversity_3</mat-icon> Doble control: la procesa otra persona.</span>
+    }
+  </mat-dialog-actions>
+} @else {
+  <div class="loading"><mat-progress-bar mode="indeterminate" /><p class="fc-muted">Cargando operación…</p></div>
+}

@@ -1,0 +1,97 @@
+<h2 mat-dialog-title class="fc-dialog-title">
+  <span class="fc-dialog-icon"><mat-icon>{{ isEdit ? 'edit_note' : 'add_card' }}</mat-icon></span>
+  {{ isEdit ? 'Editar operación pendiente' : 'Nueva operación' }}
+</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <mat-dialog-content class="content">
+    <mat-button-toggle-group formControlName="type" class="types" aria-label="Tipo de operación" hideSingleSelectionIndicator>
+      @for (t of types; track t.code) {
+        <mat-button-toggle [value]="t.code" [class]="'type-' + t.code">
+          <mat-icon>{{ t.icon }}</mat-icon>
+          <span>{{ t.name }}</span>
+        </mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+
+    <div class="fc-form-grid">
+      <mat-form-field appearance="outline" class="fc-full">
+        <mat-label>Cuenta</mat-label>
+        <mat-select formControlName="accountId">
+          @for (a of accounts(); track a.id) {
+            <mat-option [value]="a.id">{{ a.name }} · <span class="fc-muted">{{ a.branchName }}</span></mat-option>
+          }
+        </mat-select>
+        @if (fieldError('accountId'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Referencia</mat-label>
+        <input matInput formControlName="reference" class="upper" placeholder="ING-1010" />
+        <mat-hint>Única en la empresa</mat-hint>
+        @if (fieldError('reference'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de la operación</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="operationDate" [min]="minDate" [max]="today" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
+        @if (fieldError('operationDate'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="fc-full amount">
+        <mat-label>Valor (COP)</mat-label>
+        <span matTextPrefix>$&nbsp;</span>
+        <input matInput type="number" formControlName="amount" min="0.01" step="0.01" inputmode="decimal" />
+        @if (form.controls.amount.value) {
+          <mat-hint>{{ isIncome() ? 'Entran' : 'Salen' }} {{ form.controls.amount.value | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}</mat-hint>
+        }
+        @if (fieldError('amount'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+
+      @if (needsCounterparty()) {
+        <mat-form-field appearance="outline" class="fc-anim-enter" [class.fc-full]="!needsCounterpartyAccount()">
+          <mat-label>{{ needsCounterpartyAccount() ? 'Beneficiario' : 'Pagado a' }}</mat-label>
+          <input matInput formControlName="counterpartyName" />
+          @if (fieldError('counterpartyName'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+      }
+      @if (needsCounterpartyAccount()) {
+        <mat-form-field appearance="outline" class="fc-anim-enter">
+          <mat-label>Cuenta destino</mat-label>
+          <input matInput formControlName="counterpartyAccount" />
+          @if (fieldError('counterpartyAccount'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+      }
+
+      <mat-form-field appearance="outline" class="fc-full">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="description" rows="2" maxlength="250"></textarea>
+        <mat-hint align="end">{{ form.controls.description.value.length }}/250</mat-hint>
+      </mat-form-field>
+    </div>
+
+    @if (bigAmount()) {
+      <div class="fc-alert fc-alert--info fc-anim-enter">
+        <mat-icon>diversity_3</mat-icon>
+        <span>Desde $10.000.000 aplica doble control: otra persona deberá procesar esta operación.</span>
+      </div>
+    }
+
+    @if (error(); as err) {
+      <div class="fc-alert fc-alert--danger" role="alert">
+        <mat-icon>error</mat-icon>
+        <div>{{ err.message }} @if (err.correlationId) { <small>Referencia de soporte: {{ err.correlationId }}</small> }</div>
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" mat-dialog-close>Cancelar</button>
+    <button matButton="filled" class="fc-sofa-btn" type="submit" [disabled]="saving()">
+      @if (saving()) { <mat-spinner diameter="18" /> } @else { <mat-icon>check</mat-icon> }
+      {{ isEdit ? 'Guardar cambios' : 'Registrar' }}
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -1,0 +1,88 @@
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+/* Tarjeta de dos paneles, como la referencia */
+.frame {
+  width: min(1040px, 100%);
+  min-height: 600px;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-border);
+  border-radius: 28px;
+  box-shadow: var(--fc-shadow-lift);
+  overflow: hidden;
+  animation: fc-pop 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.art {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 32px;
+  background: linear-gradient(160deg, var(--fc-cream), var(--fc-linen));
+  border-right: 1px solid var(--fc-border);
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand__logo {
+  width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center;
+  background: var(--fc-gradient-sofa); color: #fff; box-shadow: 0 6px 14px -6px rgb(31 98 100 / 50%);
+}
+.brand__name { font-family: var(--fc-display); font-size: 24px; font-weight: 600; color: var(--fc-teal-deep); letter-spacing: 0.02em; }
+
+.illustration { margin: auto 0; padding: 12px 0; animation: fc-fade-up 0.6s 0.1s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.art__quote { margin: 0; text-align: center; font-family: var(--fc-display); font-style: italic; color: var(--fc-text-muted); }
+
+.panel { display: flex; align-items: center; justify-content: center; padding: 40px 44px; }
+.panel__inner { width: 100%; max-width: 380px; animation: fc-fade-up 0.5s 0.15s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+h1 { font-size: 26px; line-height: 1.25; }
+.subtitle { margin: 8px 0 18px; color: var(--fc-text-muted); }
+
+.tabs {
+  --mat-tab-active-label-text-color: var(--fc-teal);
+  --mat-tab-active-indicator-color: var(--fc-teal);
+  --mat-tab-active-focus-label-text-color: var(--fc-teal);
+  --mat-tab-active-hover-label-text-color: var(--fc-teal);
+  --mat-tab-label-text-weight: 700;
+}
+
+.form { display: flex; flex-direction: column; gap: 4px; padding-top: 20px; }
+.form .fc-alert { margin-bottom: 12px; }
+
+.row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: -4px 0 14px; flex-wrap: wrap; }
+.link {
+  border: 0; background: none; padding: 4px 0; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  color: var(--fc-teal); text-decoration: underline; text-underline-offset: 3px;
+  &:hover { color: var(--fc-teal-deep); }
+}
+
+.submit { height: 48px; font-size: 15px; }
+.bar { margin-top: 6px; border-radius: 4px; }
+.first-time { margin: 18px 0 0; font-size: 13.5px; color: var(--fc-text-muted); text-align: center; strong { color: var(--fc-text); } }
+
+.demo { padding-top: 16px; p { margin: 0 0 6px; font-size: 13.5px; } }
+.demo__icon {
+  border-radius: 12px !important;
+  display: grid !important;
+  place-items: center;
+  mat-icon { margin: 0; }
+}
+// Material pinta los avatares con su propio color: se reemplaza por el tono de cada perfil.
+.demo .demo__icon--ochre { background: var(--fc-ochre-soft) !important; color: var(--fc-ochre); }
+.demo .demo__icon--teal { background: var(--fc-teal-soft) !important; color: var(--fc-teal); }
+.demo .demo__icon--sage { background: var(--fc-sage-soft) !important; color: var(--fc-sage); }
+.demo .demo__icon--lavender { background: var(--fc-lavender-soft) !important; color: var(--fc-lavender); }
+
+@media (max-width: 860px) {
+  .frame { grid-template-columns: 1fr; min-height: 0; }
+  .art { border-right: 0; border-bottom: 1px solid var(--fc-border); padding: 18px 20px; }
+  .illustration { max-width: 300px; margin: 6px auto 0; }
+  .art__quote { display: none; }
+  .panel { padding: 28px 20px; }
+}

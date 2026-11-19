@@ -1,0 +1,6 @@
+* text=auto
+*.sql text eol=crlf
+*.ps1 text eol=crlf
+*.sh  text eol=lf
+*.dtsx text eol=crlf
+*.rdl  text eol=crlf

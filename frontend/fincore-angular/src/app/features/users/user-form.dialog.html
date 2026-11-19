@@ -1,0 +1,100 @@
+<h2 mat-dialog-title class="fc-dialog-title">
+  <span class="fc-dialog-icon"><mat-icon>{{ isEdit ? 'manage_accounts' : 'person_add' }}</mat-icon></span>
+  {{ isEdit ? 'Editar usuario' : 'Nuevo usuario' }}
+</h2>
+
+@if (loading()) { <mat-progress-bar mode="indeterminate" /> }
+
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <mat-dialog-content class="content">
+    <div class="fc-form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Usuario</mat-label>
+        <mat-icon matPrefix>alternate_email</mat-icon>
+        <input matInput formControlName="userName" autocomplete="off" placeholder="nombre.apellido" />
+        @if (fieldError('userName'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre completo</mat-label>
+        <input matInput formControlName="fullName" />
+        @if (fieldError('fullName'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" [class.fc-full]="isEdit">
+        <mat-label>Correo</mat-label>
+        <mat-icon matPrefix>mail</mat-icon>
+        <input matInput type="email" formControlName="email" />
+        @if (fieldError('email'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+
+      @if (!isEdit) {
+        <mat-form-field appearance="outline">
+          <mat-label>Contraseña inicial</mat-label>
+          <input matInput [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="new-password" />
+          <button matIconButton matSuffix type="button" (click)="showPassword.set(!showPassword())" aria-label="Mostrar u ocultar contraseña">
+            <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-hint>10+ caracteres, mayúscula, número y símbolo</mat-hint>
+          @if (fieldError('password'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+      }
+    </div>
+
+    <section>
+      <h3>Roles</h3>
+      <div class="roles">
+        @for (r of roles(); track r.code; let i = $index) {
+          <button type="button" class="role fc-enter" [style.--i]="i" [class.role--on]="form.controls.roles.value.includes(r.code)"
+                  (click)="toggleRole(r.code)" [attr.aria-pressed]="form.controls.roles.value.includes(r.code)">
+            <mat-icon>{{ roleIcons[r.code] ?? 'badge' }}</mat-icon>
+            <span class="role__text">
+              <strong>{{ r.name }}</strong>
+              <small>{{ r.description }}</small>
+            </span>
+            <mat-icon class="check">{{ form.controls.roles.value.includes(r.code) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          </button>
+        }
+      </div>
+      @if (form.controls.roles.touched && form.controls.roles.value.length === 0) { <p class="err">Elige al menos un rol.</p> }
+    </section>
+
+    <section>
+      <h3>Sucursales</h3>
+      @if (allBranches()) {
+        <div class="fc-alert fc-alert--info fc-anim-enter"><mat-icon>public</mat-icon> Con este rol verá todas las sucursales de la empresa.</div>
+      } @else {
+        <mat-chip-listbox multiple aria-label="Sucursales" class="branches fc-anim-enter">
+          @for (b of branches(); track b.branchId) {
+            <mat-chip-option [selected]="form.controls.branchIds.value.includes(b.branchId)" (selectionChange)="toggleBranch(b.branchId)">
+              <mat-icon matChipAvatar>storefront</mat-icon>{{ b.name }}
+            </mat-chip-option>
+          }
+        </mat-chip-listbox>
+      }
+    </section>
+
+    <section>
+      <h3>Reporting Services</h3>
+      <mat-form-field appearance="outline" class="windows-account">
+        <mat-label>Cuenta de Windows (opcional)</mat-label>
+        <mat-icon matPrefix>summarize</mat-icon>
+        <input matInput formControlName="windowsAccount" autocomplete="off" placeholder="EQUIPO\usuario" spellcheck="false" />
+        <mat-hint>Con esta cuenta abre los informes de SSRS y ve solo lo que su rol permite. Déjala vacía para quitar el acceso.</mat-hint>
+        @if (fieldError('windowsAccount'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+    </section>
+
+    @if (error(); as e) {
+      <div class="fc-alert fc-alert--danger" role="alert"><mat-icon>error</mat-icon> {{ e }}</div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" mat-dialog-close>Cancelar</button>
+    <button matButton="filled" class="fc-sofa-btn" type="submit" [disabled]="saving() || loading()">
+      @if (saving()) { <mat-spinner diameter="18" /> } @else { <mat-icon>check</mat-icon> }
+      {{ isEdit ? 'Guardar cambios' : 'Crear usuario' }}
+    </button>
+  </mat-dialog-actions>
+</form>

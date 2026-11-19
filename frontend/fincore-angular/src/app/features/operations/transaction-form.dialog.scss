@@ -1,0 +1,24 @@
+.content { display: flex; flex-direction: column; gap: 14px; padding-top: 6px; }
+
+.types {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-radius: 16px;
+  border-color: var(--fc-border);
+  margin-bottom: 4px;
+
+  mat-button-toggle {
+    transition: background 0.2s ease;
+    ::ng-deep .mat-button-toggle-label-content { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; line-height: 1.2; font-weight: 700; font-size: 13px; }
+  }
+  .type-ING.mat-button-toggle-checked { background: var(--fc-sage-soft); color: var(--fc-sage); }
+  .type-EGR.mat-button-toggle-checked { background: var(--fc-blush-soft); color: var(--fc-blush); }
+  .type-TRF.mat-button-toggle-checked { background: var(--fc-teal-soft); color: var(--fc-teal); }
+  .type-PAG.mat-button-toggle-checked { background: var(--fc-ochre-soft); color: var(--fc-ochre); }
+}
+
+.upper { text-transform: uppercase; }
+.amount input { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+mat-spinner { --mat-progress-spinner-active-indicator-color: #fff; }
+
+@media (max-width: 560px) { .types { grid-template-columns: repeat(2, 1fr); } }

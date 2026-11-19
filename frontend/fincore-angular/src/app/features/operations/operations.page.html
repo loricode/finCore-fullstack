@@ -1,0 +1,129 @@
+<header class="fc-page-header fc-enter">
+  <div>
+    <h1>Operaciones</h1>
+    <p>Ingresos, egresos, transferencias y pagos de tus sucursales.</p>
+  </div>
+  @if (canCreate) {
+    <button matButton="filled" class="fc-sofa-btn" type="button" (click)="openNew()">
+      <mat-icon>add</mat-icon> Nueva operación
+    </button>
+  }
+</header>
+
+<form class="filters fc-card fc-enter" style="--i: 1" [formGroup]="filters" (submit)="$event.preventDefault()">
+  <mat-form-field appearance="outline" class="search" subscriptSizing="dynamic">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label>Buscar</mat-label>
+    <input matInput formControlName="search" placeholder="Referencia, descripción o contraparte" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Sucursal</mat-label>
+    <mat-select formControlName="branchId">
+      <mat-option [value]="null">Todas</mat-option>
+      @for (b of branches(); track b.branchId) { <mat-option [value]="b.branchId">{{ b.name }}</mat-option> }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Estado</mat-label>
+    <mat-select formControlName="status">
+      <mat-option [value]="null">Todos</mat-option>
+      @for (s of statuses; track s.code) {
+        <mat-option [value]="s.code"><span class="fc-status" [class]="'fc-status fc-status--' + s.code">{{ s.name }}</span></mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Tipo</mat-label>
+    <mat-select formControlName="type">
+      <mat-option [value]="null">Todos</mat-option>
+      @for (t of types; track t.code) { <mat-option [value]="t.code">{{ t.name }}</mat-option> }
+      <mat-option value="REV">Reversión</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Período</mat-label>
+    <mat-date-range-input [rangePicker]="range">
+      <input matStartDate formControlName="from" placeholder="Desde" />
+      <input matEndDate formControlName="to" placeholder="Hasta" />
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="range" />
+    <mat-date-range-picker #range />
+  </mat-form-field>
+
+  @if (hasFilters()) {
+    <button matButton="tonal" class="fc-pastel fc-pastel--ochre clear" type="button" (click)="clearFilters()">
+      <mat-icon>filter_alt_off</mat-icon> Limpiar
+    </button>
+  }
+</form>
+
+<section class="fc-table-card fc-enter" style="--i: 2">
+  @if (loading()) { <mat-progress-bar mode="indeterminate" class="bar" /> } @else { <div class="bar"></div> }
+
+  <div class="fc-table-scroll">
+    <table mat-table [dataSource]="rows()" class="fc-table">
+      <ng-container matColumnDef="operationDate">
+        <th mat-header-cell *matHeaderCellDef>Fecha</th>
+        <td mat-cell *matCellDef="let t" class="date">{{ t.operationDate + 'T00:00:00' | date: 'dd MMM' }}<small>{{ t.operationDate + 'T00:00:00' | date: 'yyyy' }}</small></td>
+      </ng-container>
+
+      <ng-container matColumnDef="reference">
+        <th mat-header-cell *matHeaderCellDef>Referencia</th>
+        <td mat-cell *matCellDef="let t">
+          <strong class="fc-mono">{{ t.reference }}</strong>
+          <div class="sub">{{ t.counterpartyName ?? t.description ?? '—' }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="branch">
+        <th mat-header-cell *matHeaderCellDef>Sucursal</th>
+        <td mat-cell *matCellDef="let t"><span class="branch">{{ t.branchName }}</span><div class="sub">{{ t.accountCode }}</div></td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Tipo</th>
+        <td mat-cell *matCellDef="let t">
+          <span class="type" [class]="'type type--' + t.typeCode"><mat-icon>{{ typeIcons[t.typeCode] }}</mat-icon>{{ t.typeName }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef class="fc-num">Valor</th>
+        <td mat-cell *matCellDef="let t" class="fc-num">
+          <strong class="fc-money" [class.fc-money--in]="t.signedAmount > 0" [class.fc-money--out]="t.signedAmount < 0">
+            {{ t.signedAmount > 0 ? '+' : '−' }}{{ t.amount | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}
+          </strong>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let t"><span [class]="'fc-status fc-status--' + t.statusCode">{{ t.statusName }}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="createdBy">
+        <th mat-header-cell *matHeaderCellDef>Registró</th>
+        <td mat-cell *matCellDef="let t" class="sub-cell">{{ t.createdByUserName }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns" class="fc-row-clickable" tabindex="0"
+          (click)="openDetail(row)" (keydown.enter)="openDetail(row)" [matTooltip]="'Ver detalle de ' + row.reference"
+          matTooltipShowDelay="600"></tr>
+    </table>
+  </div>
+
+  @if (!loading() && rows().length === 0) {
+    <div class="fc-empty">
+      <mat-icon>{{ loadError() ? 'cloud_off' : 'eco' }}</mat-icon>
+      <p>{{ loadError() ?? (hasFilters() ? 'No hay operaciones con esos filtros.' : 'Todavía no hay operaciones. ¡Registra la primera!') }}</p>
+    </div>
+  }
+
+  <mat-paginator [length]="total()" [pageIndex]="page()" [pageSize]="pageSize()" [pageSizeOptions]="[10, 15, 30, 50]"
+                 (page)="onPage($event)" showFirstLastButtons />
+</section>

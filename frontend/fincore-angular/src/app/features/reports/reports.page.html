@@ -1,0 +1,202 @@
+<header class="fc-page-header fc-enter">
+  <div>
+    <h1>Reportes</h1>
+    <p>Cómo van las cuentas de tus sucursales, con los mismos números que Reporting Services.</p>
+  </div>
+  <div class="header-actions">
+    <form [formGroup]="form">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="period">
+        <mat-label>Período</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate formControlName="from" placeholder="Desde" />
+          <input matEndDate formControlName="to" placeholder="Hasta" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-date-range-picker #picker />
+      </mat-form-field>
+    </form>
+    <a matButton="tonal" class="fc-pastel fc-pastel--lavender" [href]="ssrsUrl" target="_blank" rel="noopener"
+       matTooltip="Informes empresariales (PDF, Excel, Word) en SQL Server Reporting Services">
+      <mat-icon>summarize</mat-icon> Reporting Services
+    </a>
+  </div>
+</header>
+
+@if (loading()) { <mat-progress-bar mode="indeterminate" class="top-bar" /> }
+
+@if (indicators(); as i) {
+  <section class="kpis" aria-label="Indicadores financieros">
+    <article class="kpi kpi--sage fc-enter" style="--i: 1">
+      <span class="kpi__icon"><mat-icon>trending_up</mat-icon></span>
+      <span class="kpi__label">Ingresos</span>
+      <strong class="kpi__value fc-money">{{ i.totalIncome | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
+      <span class="kpi__hint">Operaciones efectivas</span>
+    </article>
+    <article class="kpi kpi--blush fc-enter" style="--i: 2">
+      <span class="kpi__icon"><mat-icon>trending_down</mat-icon></span>
+      <span class="kpi__label">Egresos</span>
+      <strong class="kpi__value fc-money">{{ i.totalExpense | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
+      <span class="kpi__hint">Pagos, transferencias y egresos</span>
+    </article>
+    <article class="kpi kpi--lavender fc-enter" style="--i: 3">
+      <span class="kpi__icon"><mat-icon>balance</mat-icon></span>
+      <span class="kpi__label">Neto</span>
+      <strong class="kpi__value fc-money">{{ i.netAmount | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
+      <span class="kpi__hint">{{ i.operationCount }} operaciones en el período</span>
+    </article>
+    <article class="kpi kpi--teal kpi--ring fc-enter" style="--i: 4">
+      <svg viewBox="0 0 80 80" class="ring" aria-hidden="true">
+        <circle cx="40" cy="40" r="34" class="ring__track" />
+        <circle cx="40" cy="40" r="34" class="ring__value" [attr.stroke-dasharray]="coverageDash()" transform="rotate(-90 40 40)" />
+      </svg>
+      <div>
+        <span class="kpi__label">Cobertura de conciliación</span>
+        <strong class="kpi__value">{{ i.reconciliationCoveragePct | number: '1.0-1' }}%</strong>
+        <span class="kpi__hint">de lo efectivo ya cuadra con el banco</span>
+      </div>
+    </article>
+    <article class="kpi kpi--ochre fc-enter" style="--i: 5">
+      <span class="kpi__icon"><mat-icon>rule</mat-icon></span>
+      <span class="kpi__label">Diferencias abiertas</span>
+      <strong class="kpi__value">{{ i.openDifferenceCount }}</strong>
+      <span class="kpi__hint fc-money">{{ i.openDifferenceAmount | currency: 'COP' : 'symbol-narrow' : '1.0-0' }} por revisar</span>
+    </article>
+    <article class="kpi kpi--teal fc-enter" style="--i: 6">
+      <span class="kpi__icon"><mat-icon>upload_file</mat-icon></span>
+      <span class="kpi__label">Calidad de las cargas</span>
+      <strong class="kpi__value">{{ 100 - i.etlRejectionPct | number: '1.0-1' }}%</strong>
+      <span class="kpi__hint">{{ i.etlRowsRead - i.etlRowsRejected }} de {{ i.etlRowsRead }} movimientos aceptados</span>
+    </article>
+  </section>
+
+  @if (states().length) {
+    <section class="fc-card states fc-enter" style="--i: 7">
+      <h2>Estado de las operaciones</h2>
+      <div class="stack" role="img" aria-label="Distribución de operaciones por estado">
+        @for (s of states(); track s.code) {
+          <span [class]="'stack__part fc-status--' + s.code" [style.flex-basis.%]="s.pct" [matTooltip]="s.name + ': ' + s.value"></span>
+        }
+      </div>
+      <div class="stack__legend">
+        @for (s of states(); track s.code) { <span [class]="'fc-status fc-status--' + s.code">{{ s.name }} · {{ s.value }}</span> }
+      </div>
+    </section>
+  }
+}
+
+<section class="fc-card fc-enter" style="--i: 8">
+  <header class="card-header">
+    <h2>Entradas y salidas</h2>
+    <div class="card-actions">
+      <mat-button-toggle-group [value]="granularity()" (change)="setGranularity($event.value)" hideSingleSelectionIndicator aria-label="Agrupar por">
+        <mat-button-toggle value="DAY">Por día</mat-button-toggle>
+        <mat-button-toggle value="MONTH">Por mes</mat-button-toggle>
+      </mat-button-toggle-group>
+      @if (canExport) {
+        <button matIconButton (click)="export('operations-by-period')" [disabled]="exporting() !== null" matTooltip="Exportar a CSV">
+          <mat-icon>download</mat-icon>
+        </button>
+      }
+    </div>
+  </header>
+  <fc-period-chart [rows]="periods()" [granularity]="granularity()" />
+</section>
+
+<section class="fc-table-card fc-enter" style="--i: 9">
+  <header class="card-header padded">
+    <h2>Resumen por sucursal</h2>
+    @if (canExport) {
+      <button matButton="tonal" class="fc-pastel fc-pastel--sage" (click)="export('branch-summary')" [disabled]="exporting() !== null">
+        <mat-icon>download</mat-icon> Exportar CSV
+      </button>
+    }
+  </header>
+  <div class="fc-table-scroll">
+    <table mat-table [dataSource]="branches()" class="fc-table">
+      <ng-container matColumnDef="branch">
+        <th mat-header-cell *matHeaderCellDef>Sucursal</th>
+        <td mat-cell *matCellDef="let b"><strong>{{ b.branchName }}</strong><div class="sub">{{ b.city }}</div></td>
+      </ng-container>
+      <ng-container matColumnDef="operations">
+        <th mat-header-cell *matHeaderCellDef class="fc-num">Operaciones</th>
+        <td mat-cell *matCellDef="let b" class="fc-num">{{ b.totalOperations }}</td>
+      </ng-container>
+      <ng-container matColumnDef="flow">
+        <th mat-header-cell *matHeaderCellDef>Flujo</th>
+        <td mat-cell *matCellDef="let b">
+          <div class="flow" [matTooltip]="'Ingresos vs egresos'">
+            <span class="flow__in" [style.width.%]="(100 * b.totalIncome) / maxFlow()"></span>
+            <span class="flow__out" [style.width.%]="(100 * b.totalExpense) / maxFlow()"></span>
+          </div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="income">
+        <th mat-header-cell *matHeaderCellDef class="fc-num">Ingresos</th>
+        <td mat-cell *matCellDef="let b" class="fc-num fc-money fc-money--in">{{ b.totalIncome | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="expense">
+        <th mat-header-cell *matHeaderCellDef class="fc-num">Egresos</th>
+        <td mat-cell *matCellDef="let b" class="fc-num fc-money fc-money--out">{{ b.totalExpense | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="net">
+        <th mat-header-cell *matHeaderCellDef class="fc-num">Neto</th>
+        <td mat-cell *matCellDef="let b" class="fc-num"><strong class="fc-money">{{ b.netAmount | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong></td>
+      </ng-container>
+      <ng-container matColumnDef="states">
+        <th mat-header-cell *matHeaderCellDef>Estados</th>
+        <td mat-cell *matCellDef="let b" class="mini-states">
+          @if (b.pendingCount) { <span class="fc-status fc-status--PENDING">{{ b.pendingCount }}</span> }
+          @if (b.processedCount) { <span class="fc-status fc-status--PROCESSED">{{ b.processedCount }}</span> }
+          @if (b.reconciledCount) { <span class="fc-status fc-status--RECONCILED">{{ b.reconciledCount }}</span> }
+          @if (b.rejectedCount) { <span class="fc-status fc-status--REJECTED">{{ b.rejectedCount }}</span> }
+          @if (b.reversedCount) { <span class="fc-status fc-status--REVERSED">{{ b.reversedCount }}</span> }
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="branchColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: branchColumns"></tr>
+    </table>
+  </div>
+</section>
+
+@if (canSeeActivity) {
+  <section class="fc-table-card fc-enter" style="--i: 10">
+    <header class="card-header padded">
+      <h2>Actividad por usuario</h2>
+      @if (canExport) {
+        <button matButton="tonal" class="fc-pastel fc-pastel--lavender" (click)="export('user-activity')" [disabled]="exporting() !== null">
+          <mat-icon>download</mat-icon> Exportar CSV
+        </button>
+      }
+    </header>
+    <div class="fc-table-scroll">
+      <table mat-table [dataSource]="activity()" class="fc-table">
+        <ng-container matColumnDef="user">
+          <th mat-header-cell *matHeaderCellDef>Usuario</th>
+          <td mat-cell *matCellDef="let u"><strong>{{ u.fullName }}</strong><div class="sub fc-mono">{{ u.userName }}</div></td>
+        </ng-container>
+        <ng-container matColumnDef="operations">
+          <th mat-header-cell *matHeaderCellDef class="fc-num">Operaciones</th>
+          <td mat-cell *matCellDef="let u" class="fc-num">{{ u.operationsCreated }}</td>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef class="fc-num">Valor registrado</th>
+          <td mat-cell *matCellDef="let u" class="fc-num fc-money">{{ u.amountCreated | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="changes">
+          <th mat-header-cell *matHeaderCellDef class="fc-num">Cambios de estado</th>
+          <td mat-cell *matCellDef="let u" class="fc-num">{{ u.statusChanges }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="fc-num">Acciones auditadas</th>
+          <td mat-cell *matCellDef="let u" class="fc-num">{{ u.auditActions }}</td>
+        </ng-container>
+        <ng-container matColumnDef="last">
+          <th mat-header-cell *matHeaderCellDef>Última acción</th>
+          <td mat-cell *matCellDef="let u" class="sub">{{ u.lastActionAtUtc ? (u.lastActionAtUtc + 'Z' | date: 'd MMM, h:mm a') : '—' }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="activityColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: activityColumns"></tr>
+      </table>
+    </div>
+  </section>
+}

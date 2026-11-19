@@ -1,0 +1,24 @@
+{
+  "name": "fincore-node",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Adaptador de webhooks de proveedores bancarios para FinCore: verifica firmas, traduce al contrato de FinCore y entrega con reintentos.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/server.ts",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
+    "simulate": "node scripts/simulate-bank.ts"
+  },
+  "dependencies": {
+    "express": "5.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/node": "24.19.2",
+    "typescript": "6.0.2"
+  }
+}

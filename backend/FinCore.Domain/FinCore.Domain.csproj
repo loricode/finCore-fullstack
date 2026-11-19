@@ -1,0 +1,3 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Domain no referencia ningún paquete ni proyecto: solo la biblioteca base de .NET. -->
+</Project>

@@ -1,0 +1,314 @@
+/*
+  FinCore · tema "sala de estar"
+  Paleta tomada de una sala acogedora: el verde azulado del sofá de terciopelo, el lino de las paredes, el ocre de las
+  cortinas, el rosa empolvado de la manta, la salvia de las plantas, la lavanda de las flores y el roble claro del piso.
+  Modo oscuro: "noche en casa", tonos cálidos y tenues.
+  Los componentes usan solo variables --fc-* y los tokens --mat-sys-* de Material 3.
+*/
+@use '@angular/material' as mat;
+@use './styles/theme-colors' as palette;
+@use '@fontsource-variable/nunito';
+@use '@fontsource-variable/fraunces';
+@use 'material-symbols/rounded';
+
+html {
+  color-scheme: light dark;
+  @include mat.theme((
+    color: (primary: palette.$primary-palette, tertiary: palette.$tertiary-palette),
+    typography: (plain-family: 'Nunito Variable', brand-family: 'Fraunces Variable'),
+    density: 0,
+  ));
+
+  // Formas suaves y redondeadas en todo Material
+  @include mat.button-overrides((
+    filled-container-shape: 14px,
+    outlined-container-shape: 14px,
+    tonal-container-shape: 14px,
+    text-container-shape: 14px,
+  ));
+  @include mat.dialog-overrides((container-shape: 24px));
+  @include mat.form-field-overrides((outlined-container-shape: 14px));
+  @include mat.chips-overrides((container-shape-radius: 999px));
+}
+
+:root {
+  /* Paleta de la sala */
+  --fc-teal:          light-dark(#1f6264, #7fc3c2);
+  --fc-teal-deep:     light-dark(#174a4c, #5aa5a5);
+  --fc-teal-soft:     light-dark(#d6ebe8, #1f3637);
+  --fc-linen:         light-dark(#f4eee5, #24201c);
+  --fc-cream:         light-dark(#fbf8f2, #1b1916);
+  --fc-ochre:         light-dark(#b88a47, #e2bd85);
+  --fc-ochre-soft:    light-dark(#f6e8cf, #3a2f1f);
+  --fc-blush:         light-dark(#c8735f, #eba795);
+  --fc-blush-soft:    light-dark(#f8e0d8, #3d2823);
+  --fc-sage:          light-dark(#5f7d58, #a9c3a0);
+  --fc-sage-soft:     light-dark(#e2ebdc, #263024);
+  --fc-lavender:      light-dark(#7a65a6, #c3b3e3);
+  --fc-lavender-soft: light-dark(#ebe5f5, #2d283a);
+  --fc-oak:           light-dark(#d8b98f, #8a7152);
+
+  /* Uso */
+  --fc-bg: var(--fc-cream);
+  --fc-surface: light-dark(#ffffff, #23201c);
+  --fc-surface-2: var(--fc-linen);
+  --fc-border: light-dark(#e8dfd2, #3a342d);
+  --fc-text: light-dark(#3a3632, #efe8de);
+  --fc-text-muted: light-dark(#7a7068, #b3a99c);
+  --fc-row-alt: light-dark(#f7f2ea, #26221e);
+  --fc-row-hover: light-dark(#e9f2ee, #2b3533);
+  --fc-danger: var(--fc-blush);
+  --fc-success: var(--fc-sage);
+  --fc-radius: 20px;
+  --fc-shadow: 0 1px 2px rgb(58 54 50 / 4%), 0 8px 24px -8px rgb(58 54 50 / 12%);
+  --fc-shadow-lift: 0 2px 4px rgb(58 54 50 / 6%), 0 18px 40px -12px rgb(31 98 100 / 25%);
+  --fc-font: 'Nunito Variable', system-ui, sans-serif;
+  --fc-display: 'Fraunces Variable', Georgia, serif;
+  --fc-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  /* Degradados */
+  --fc-gradient-sofa: linear-gradient(145deg, #2a7375 0%, #1f6264 45%, #174a4c 100%);
+  --fc-gradient-room: radial-gradient(1200px 600px at 100% -10%, light-dark(#f8e0d8aa, #3d282355), transparent 60%),
+                      radial-gradient(900px 500px at -10% 110%, light-dark(#e2ebdcaa, #26302455), transparent 60%),
+                      var(--fc-cream);
+  --fc-gradient-ochre: linear-gradient(135deg, var(--fc-ochre-soft), light-dark(#fbf3e3, #2c241a));
+  --fc-gradient-blush: linear-gradient(135deg, var(--fc-blush-soft), light-dark(#fcefea, #2f211d));
+  --fc-gradient-sage: linear-gradient(135deg, var(--fc-sage-soft), light-dark(#f1f6ee, #1f271d));
+  --fc-gradient-lavender: linear-gradient(135deg, var(--fc-lavender-soft), light-dark(#f6f2fb, #252130));
+  --fc-gradient-teal: linear-gradient(135deg, var(--fc-teal-soft), light-dark(#eef7f5, #192b2c));
+
+  /* Material 3: superficies cálidas en lugar de grises */
+  --mat-sys-surface: var(--fc-surface);
+  --mat-sys-surface-container-lowest: var(--fc-surface);
+  --mat-sys-surface-container-low: var(--fc-cream);
+  --mat-sys-surface-container: var(--fc-linen);
+  --mat-sys-surface-container-high: var(--fc-linen);
+  --mat-sys-on-surface: var(--fc-text);
+  --mat-sys-on-surface-variant: var(--fc-text-muted);
+  --mat-sys-outline-variant: var(--fc-border);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--fc-font);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--fc-text);
+  background: var(--fc-gradient-room);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; line-height: 1.2; color: var(--fc-text); }
+h1 { font-family: var(--fc-display); font-weight: 600; font-size: 30px; letter-spacing: -0.01em; }
+h2 { font-family: var(--fc-display); font-weight: 600; font-size: 19px; }
+a { color: var(--fc-teal); }
+
+.material-symbols-rounded { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+/* ------------------------------------------------------------------ animaciones */
+@keyframes fc-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fc-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fc-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(18px, -22px) scale(1.06); }
+}
+@keyframes fc-pop {
+  0%   { transform: scale(0.96); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Entrada escalonada: style="--i: 2" retrasa el elemento 2 × 60 ms */
+.fc-enter { animation: fc-fade-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 60ms); }
+.fc-fade-in-anim { animation: fc-fade-in 0.4s ease both; }
+
+/* Animaciones de entrada y salida de Angular (animate.enter / animate.leave) */
+.fc-anim-enter { animation: fc-fade-up 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.fc-anim-leave { animation: fc-fade-in 0.2s ease reverse both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; }
+}
+
+/* ------------------------------------------------------------------ superficies */
+.fc-card {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-border);
+  border-radius: var(--fc-radius);
+  box-shadow: var(--fc-shadow);
+  padding: 22px;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.fc-card--hover:hover { box-shadow: var(--fc-shadow-lift); transform: translateY(-2px); }
+
+.fc-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  p { margin: 6px 0 0; color: var(--fc-text-muted); }
+}
+
+.fc-muted { color: var(--fc-text-muted); }
+.fc-mono { font-family: var(--fc-mono); font-size: 13px; }
+.fc-money { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fc-money--in { color: var(--fc-sage); }
+.fc-money--out { color: var(--fc-blush); }
+
+/* ------------------------------------------------------------------ botones pastel (Material tonal) */
+.fc-pastel {
+  &.mat-mdc-unelevated-button, &.mat-mdc-button-base {
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--fc-shadow); filter: saturate(1.08); }
+    &:active:not(:disabled) { transform: translateY(0); }
+  }
+}
+.fc-pastel--teal     { --mat-button-tonal-container-color: var(--fc-teal-soft);     --mat-button-tonal-label-text-color: var(--fc-teal-deep); }
+.fc-pastel--sage     { --mat-button-tonal-container-color: var(--fc-sage-soft);     --mat-button-tonal-label-text-color: var(--fc-sage); }
+.fc-pastel--blush    { --mat-button-tonal-container-color: var(--fc-blush-soft);    --mat-button-tonal-label-text-color: var(--fc-blush); }
+.fc-pastel--ochre    { --mat-button-tonal-container-color: var(--fc-ochre-soft);    --mat-button-tonal-label-text-color: var(--fc-ochre); }
+.fc-pastel--lavender { --mat-button-tonal-container-color: var(--fc-lavender-soft); --mat-button-tonal-label-text-color: var(--fc-lavender); }
+
+/* Botón principal con el degradado del sofá */
+.fc-sofa-btn.mat-mdc-unelevated-button {
+  // Tokens de Material: sin ellos, en modo oscuro la etiqueta toma on-primary (oscuro) sobre el degradado.
+  --mat-button-filled-label-text-color: #fff;
+  --mat-button-filled-icon-color: #fff;
+  --mat-button-filled-state-layer-color: #fff;
+  background: var(--fc-gradient-sofa);
+  color: #fff;
+  box-shadow: 0 6px 16px -6px rgb(31 98 100 / 55%);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 22px -8px rgb(31 98 100 / 60%); }
+  &:disabled { opacity: 0.6; }
+}
+
+/* ------------------------------------------------------------------ estados (chips) */
+.fc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px 3px 9px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  &::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: 0.85; }
+}
+.fc-status--PENDING    { background: var(--fc-ochre-soft);    color: var(--fc-ochre); }
+.fc-status--PROCESSED  { background: var(--fc-teal-soft);     color: var(--fc-teal); }
+.fc-status--RECONCILED { background: var(--fc-sage-soft);     color: var(--fc-sage); }
+.fc-status--REJECTED   { background: var(--fc-blush-soft);    color: var(--fc-blush); }
+.fc-status--REVERSED   { background: var(--fc-lavender-soft); color: var(--fc-lavender); }
+.fc-status--ACTIVE     { background: var(--fc-sage-soft);     color: var(--fc-sage); }
+.fc-status--LOCKED     { background: var(--fc-ochre-soft);    color: var(--fc-ochre); }
+.fc-status--INACTIVE   { background: var(--fc-blush-soft);    color: var(--fc-blush); }
+
+/* Resultados de conciliación */
+.fc-result--MATCHED             { background: var(--fc-sage-soft);     color: var(--fc-sage); }
+.fc-result--AMOUNT_MISMATCH     { background: var(--fc-blush-soft);    color: var(--fc-blush); }
+.fc-result--DATE_MISMATCH       { background: var(--fc-ochre-soft);    color: var(--fc-ochre); }
+.fc-result--MISSING_IN_BANK     { background: var(--fc-lavender-soft); color: var(--fc-lavender); }
+.fc-result--MISSING_INTERNAL    { background: var(--fc-teal-soft);     color: var(--fc-teal); }
+.fc-result--DUPLICATE_REFERENCE { background: var(--fc-blush-soft);    color: var(--fc-blush); }
+.fc-result--PENDING_REVIEW      { background: var(--fc-ochre-soft);    color: var(--fc-ochre); }
+.fc-status--COMPLETED { background: var(--fc-sage-soft); color: var(--fc-sage); }
+.fc-status--COMPLETED_WITH_ERRORS { background: var(--fc-ochre-soft); color: var(--fc-ochre); }
+.fc-status--FAILED { background: var(--fc-blush-soft); color: var(--fc-blush); }
+.fc-status--RUNNING { background: var(--fc-teal-soft); color: var(--fc-teal); }
+
+.fc-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--fc-lavender-soft);
+  color: var(--fc-lavender);
+  margin: 2px 4px 2px 0;
+}
+
+/* ------------------------------------------------------------------ tablas (mat-table) con filas intercaladas */
+.fc-table-card {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-border);
+  border-radius: var(--fc-radius);
+  box-shadow: var(--fc-shadow);
+  overflow: hidden;
+}
+.fc-table-scroll { overflow-x: auto; }
+
+table.fc-table {
+  width: 100%;
+  background: transparent;
+  --mat-table-background-color: transparent;
+  --mat-table-header-headline-color: var(--fc-text-muted);
+  --mat-table-row-item-outline-color: transparent;
+
+  th.mat-mdc-header-cell {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--fc-linen);
+    border-bottom: 1px solid var(--fc-border);
+  }
+  tr.mat-mdc-row {
+    transition: background-color 0.2s ease;
+    animation: fc-fade-in 0.35s ease both;
+  }
+  tr.mat-mdc-row:nth-child(even) { background: var(--fc-row-alt); }
+  tr.mat-mdc-row:hover { background: var(--fc-row-hover); }
+  tr.fc-row-clickable { cursor: pointer; }
+  td.mat-mdc-cell, th.mat-mdc-header-cell { padding: 12px 16px; }
+  td.fc-num, th.fc-num { text-align: right; }
+}
+
+.fc-empty {
+  padding: 48px 16px;
+  text-align: center;
+  color: var(--fc-text-muted);
+  .material-symbols-rounded, mat-icon { font-size: 40px; width: 40px; height: 40px; color: var(--fc-oak); }
+}
+
+/* ------------------------------------------------------------------ formularios */
+.fc-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 4px 16px;
+}
+.fc-full { grid-column: 1 / -1; }
+
+.fc-alert {
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  animation: fc-pop 0.25s ease both;
+}
+.fc-alert--danger { background: var(--fc-blush-soft); color: var(--fc-blush); }
+.fc-alert--info { background: var(--fc-teal-soft); color: var(--fc-teal-deep); }
+.fc-alert small { display: block; margin-top: 4px; font-family: var(--fc-mono); opacity: 0.85; }
+
+/* Snackbars con la paleta */
+.fc-snack-success { --mat-snack-bar-container-color: var(--fc-sage); --mat-snack-bar-supporting-text-color: #fff; }
+.fc-snack-error { --mat-snack-bar-container-color: var(--fc-blush); --mat-snack-bar-supporting-text-color: #fff; }
+
+/* Diálogos: cabecera con un toque de color */
+.fc-dialog .mat-mdc-dialog-surface { background: var(--fc-surface); }
+.fc-dialog-title { display: flex; align-items: center; gap: 10px; }
+.fc-dialog-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: var(--fc-gradient-teal); color: var(--fc-teal);
+}

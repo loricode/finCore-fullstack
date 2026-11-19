@@ -1,0 +1,77 @@
+@if (auth.currentUser(); as user) {
+  <section class="welcome fc-enter">
+    <div>
+      <h1>Hola, {{ user.fullName.split(' ')[0] }} <span class="wave" aria-hidden="true">👋</span></h1>
+      <p>Así va {{ monthName() | date: 'MMMM' }} en {{ user.branches.length === 1 ? user.branches[0].name : user.branches.length + ' sucursales' }}.</p>
+    </div>
+    @if (canSeeOperations) {
+      <a matButton="filled" class="fc-sofa-btn" routerLink="/operaciones">
+        <mat-icon>receipt_long</mat-icon> Ver operaciones
+      </a>
+    }
+  </section>
+
+  @if (canSeeOperations) {
+    <section class="kpis" aria-label="Indicadores del mes">
+      @for (kpi of kpis(); track kpi.label; let i = $index) {
+        <article class="kpi fc-enter" [class]="'kpi kpi--' + kpi.tone + ' fc-enter'" [style.--i]="i + 1">
+          <span class="kpi__icon"><mat-icon>{{ kpi.icon }}</mat-icon></span>
+          <span class="kpi__label">{{ kpi.label }}</span>
+          <strong class="kpi__value fc-money">{{ kpi.value }}</strong>
+          <span class="kpi__hint">{{ kpi.hint }}</span>
+        </article>
+      } @empty {
+        @for (n of [1, 2, 3, 4, 5, 6]; track n) { <div class="kpi kpi--skeleton"></div> }
+      }
+    </section>
+
+    <section class="fc-card accounts fc-enter" style="--i: 7">
+      <header>
+        <div>
+          <h2>Cuentas</h2>
+          <p class="fc-muted">Saldo a hoy de las operaciones procesadas y conciliadas.</p>
+        </div>
+        <div class="total">
+          <span class="fc-muted">Total</span>
+          <strong class="fc-money">{{ totalBalance() | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</strong>
+        </div>
+      </header>
+      <div class="account-grid">
+        @for (a of accounts() ?? []; track a.id; let i = $index) {
+          <article class="account fc-card--hover" [style.--i]="i">
+            <div class="account__top">
+              <span class="account__icon"><mat-icon>account_balance</mat-icon></span>
+              <div>
+                <strong>{{ a.name }}</strong>
+                <small class="fc-muted">{{ a.bankName }} · {{ a.bankAccountNumberMasked }}</small>
+              </div>
+            </div>
+            <div class="account__balance fc-money" [class.fc-money--out]="a.balance < 0">
+              {{ a.balance | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}
+            </div>
+            <span class="fc-tag">{{ a.branchName }}</span>
+          </article>
+        } @empty {
+          <p class="fc-muted">No hay cuentas en tus sucursales.</p>
+        }
+      </div>
+    </section>
+  }
+
+  <section class="profile fc-card fc-enter" style="--i: 8">
+    <div class="profile__block">
+      <h2>Tu perfil</h2>
+      <div class="chips">@for (r of user.roles; track r) { <span class="fc-tag">{{ r }}</span> }</div>
+    </div>
+    <div class="profile__block">
+      <h2>Tus sucursales</h2>
+      <div class="chips">
+        @for (b of user.branches; track b.branchId) { <span class="branch-chip"><mat-icon>storefront</mat-icon>{{ b.name }}</span> }
+      </div>
+    </div>
+    <details class="profile__block">
+      <summary>Ver mis {{ user.permissions.length }} permisos</summary>
+      <div class="chips perms">@for (p of user.permissions; track p) { <span class="fc-mono perm">{{ p }}</span> }</div>
+    </details>
+  </section>
+}
