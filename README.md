@@ -101,7 +101,7 @@ FinCore/
 | Angular | Angular 22 zoneless con signals y Material 3 con tema propio (claro y oscuro), degradados y animaciones; tablas con paginación del servidor y filas intercaladas; formularios reactivos con errores por campo de la API; interceptor con renovación de sesión única ante 401; guards por permiso |
 | Docker | Compose con healthchecks y orden de arranque, migrador que reutiliza `deploy.ps1`, imágenes multi-etapa no root, nginx con CSP, pruebas en contenedores |
 | Windows Service | `FinCore.Worker` con `UseWindowsService`: 4 trabajos programados con CorrelationId por ejecución; el mismo binario corre en Docker |
-| Node.js | Adaptador con firma HMAC anti-replay, traducción sin reglas, cola con reintentos exponenciales y dead letter; 16 pruebas `node:test` |
+| Node.js | Adaptador con firma HMAC anti-replay, traducción sin reglas, cola con reintentos exponenciales y dead letter; 18 pruebas `node:test` |
 | Oracle · SSIS | Oracle 23ai en Docker como sistema legado; extracción incremental por marca de agua con una consulta compartida entre el Worker y el diseño del paquete SSIS |
 | SSRS | 5 informes RDL 2016 (tablas con filas intercaladas, gráficos, tarjetas, parámetros en cascada) generados desde código y publicados con la API REST v2.0; origen compartido con un login que solo puede ejecutar `rpt.*`; mismos procedimientos que la API |
 | Documentación · Scrum/Kanban · Code Review | PRD, historias con criterios verificables, specs, ADR; Conventional Commits y PR por historia |

@@ -156,7 +156,7 @@ Como plataforma quiero recibir notificaciones de movimientos en línea.
 - *Dado* el mismo evento reenviado, *entonces* la API no crea otro movimiento (`UQ_InboundEvents_Provider_Event`).
 - *Si* la API no responde, *entonces* Node reintenta con espera exponencial (1 s, 2 s, 4 s, 8 s, 16 s).
 - *Si* la API se cae a mitad del proceso, *entonces* el Worker completa el evento (`InboundEventRecovery`).
-- Verifica: 16 pruebas de `integrations/fincore-node` (firma, traducción, reintentos, dead letter, HTTP), `InboundEventTests`, `IntegrationApiTests` (procesado, duplicado, 409, 422, ignorado, 403); recorrido con `bank-simulator`.
+- Verifica: 18 pruebas de `integrations/fincore-node` (firma, traducción, reintentos, dead letter, HTTP), `InboundEventTests`, `IntegrationApiTests` (procesado, duplicado, 409, 422, ignorado, 403); recorrido con `bank-simulator`.
 
 **HU-20 · Importar movimientos desde Oracle** ✅ Worker · 🟡 paquete SSIS (`.dtsx` por construir en Visual Studio)
 Como plataforma quiero traer los movimientos del sistema legado sin intervención manual.

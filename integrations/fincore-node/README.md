@@ -53,7 +53,7 @@ Node 24 ejecuta TypeScript directamente (sin compilación); `tsc` solo verifica 
 ## Comandos
 
 ```powershell
-npm test                 # 16 pruebas (node:test)
+npm test                 # 18 pruebas (node:test)
 npm run typecheck        # tsc --noEmit
 npm start                # adaptador en :5090
 npm run simulate         # envía los webhooks de prueba
